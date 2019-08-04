@@ -27,41 +27,52 @@ struct ContentView : View {
     }
     
     var body: some View {
-        VStack {
-            HStack {
-                //Target Color Block
-                VStack {
-                    Rectangle()
-                        .foregroundColor(Color(red: rTarget, green: gTarget, blue: bTarget))
-                    Text("Match this Color")
-                }
-                //Guess Color Block
-                VStack {
-                    Rectangle()
-                        .foregroundColor(Color(red: rGuess, green: gGuess, blue: bGuess))
-                    HStack {
-                        Text("R: \(Int(rGuess * 255.0))")
-                        Text("G: \(Int(gGuess * 255.0))")
-                        Text("B: \(Int(bGuess * 255.0))")
+        NavigationView {
+            VStack {
+                HStack {
+                    //Target Color Block
+                    VStack {
+                        Rectangle()
+                            .foregroundColor(Color(red: rTarget, green: gTarget, blue: bTarget))
+                        Text("Match this Color")
+                    }
+                    //Guess Color Block
+                    VStack {
+                        Rectangle()
+                            .foregroundColor(Color(red: rGuess, green: gGuess, blue: bGuess))
+                        HStack {
+                            Text("R: \(Int(rGuess * 255.0))")
+                            Text("G: \(Int(gGuess * 255.0))")
+                            Text("B: \(Int(bGuess * 255.0))")
+                        }
                     }
                 }
+                VStack {
+                    Text("Target Color Block")
+                    Text("Guess Color Block")
+                }
+                Button(action: {
+                    self.showAlert = true
+                }) {
+                    Text("Hit me button")
+                }
+                .presentation($showAlert) {
+                    Alert(title: Text("Your Score"),message: Text("\(computeScore())"))
+                }
+                ColorSlider(value: $rGuess, textColor: .red)
+                ColorSlider(value: $gGuess, textColor: .green)
+                ColorSlider(value: $bGuess, textColor: .blue)
+                NavigationLink(destination: photoCollectionView(), label: {
+                    Text(" Go to Image Page ")
+                        .background(Color.yellow)
+                        .font(.system(size: 24))
+                        .foregroundColor(Color.white)
+                        .cornerRadius(9)
+                })
             }
-            VStack {
-                Text("Target Color Block")
-                Text("Guess Color Block")
-            }
-            Button(action: {
-                self.showAlert = true
-            }) {
-                Text("Hit me button")
-            }
-            .presentation($showAlert) {
-                Alert(title: Text("Your Score"),message: Text("\(computeScore())"))
-            }
-            ColorSlider(value: $rGuess, textColor: .red)
-            ColorSlider(value: $gGuess, textColor: .green)
-            ColorSlider(value: $bGuess, textColor: .blue)
+            .navigationBarTitle(Text("Guess Color"))
         }
+        
     }
 }
 
@@ -83,5 +94,55 @@ struct ColorSlider : View {
             Slider(value: $value, from: 0.0, through: 1.0)
             Text("255").color(textColor)
         }.padding()
+    }
+}
+struct Box {
+    var id: Int
+    let title, imageUrl: String
+}
+
+struct photoCollectionView: View {
+    
+    let boxes: [Box] = [
+        Box(id: 1, title: "Surfing", imageUrl: "1"),
+        Box(id: 2, title: "Surfboard", imageUrl: "2"),
+        Box(id: 3, title: "morning", imageUrl: "3"),
+        Box(id: 4, title: "Enjoy", imageUrl: "4"),
+        Box(id: 5, title: "morning", imageUrl: "5"),
+        Box(id: 6, title: "Enjoy", imageUrl: "6"),
+        Box(id: 7, title: "YOLO", imageUrl: "7"),
+        Box(id: 8, title: "Summer Time", imageUrl: "8"),
+        Box(id: 9, title: "Yayy", imageUrl: "9")
+
+    ]
+    
+    var body: some View {
+        NavigationView {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack {
+                    ForEach(boxes.identified(by: \.id)) { box in
+                        BoxView(box: box)
+                    }
+                }
+            }.padding(20)
+        }.navigationBarTitle("Surf Pics")
+    }
+}
+
+struct BoxView: View {
+    let box: Box
+    
+    var body: some View {
+        VStack {
+            Image(box.imageUrl)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: 300, height: 400)
+                .cornerRadius(12)
+            
+            Text(box.title)
+                .font(.subheadline)
+                .fontWeight(.bold)
+        }
     }
 }
